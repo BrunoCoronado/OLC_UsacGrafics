@@ -5,18 +5,35 @@
  */
 package sistema.ui;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 /**
  *
  * @author bruno
  */
 public class ventanaPrincipal extends javax.swing.JFrame {
-
+    //definicion botones ui
+    private JButton btnAbrir;
+    private JButton btnGuardar;
+    private JButton btnAnalizar;
+    private JButton btnGuardarComo;
+    private JButton btnReporteErrores;
+    //definicio area de texto
+    private JTextArea txtArea;
+    
     /**
      * Creates new form ventanaPrincipal
      */
     public ventanaPrincipal() {
         initComponents();
-        parametrosIniciales();
+        configuracionVentana();
     }
 
     /**
@@ -44,7 +61,44 @@ public class ventanaPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void parametrosIniciales(){}
+    private void configuracionVentana(){
+        //propiedades de la ventana
+        this.setSize(1250, 1000);
+        this.setResizable(false);
+        this.setLayout(new BorderLayout());
+        //elementos de la ventana
+        //panel de opciones
+        JPanel panelOpciones = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnAbrir = new JButton("Abrir");
+        btnGuardar = new JButton("Guardar");
+        btnGuardarComo = new JButton("Guardar Como");
+        btnReporteErrores = new JButton("Reporte Errores");
+        panelOpciones.add(btnAbrir);
+        panelOpciones.add(btnGuardar);
+        panelOpciones.add(btnGuardarComo);
+        panelOpciones.add(btnReporteErrores);
+        this.add(panelOpciones, BorderLayout.PAGE_START);
+        //panel de texto
+        txtArea = new JTextArea();
+        JScrollPane scroll = new JScrollPane(txtArea);
+        this.add(scroll, BorderLayout.CENTER);
+        //pie de ventana
+        JPanel panelPie = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnAnalizar = new JButton("Analizar");
+        //funcionamiento al boton
+        btnAnalizar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                btnAnalizar(ae);
+            }
+        });
+        panelPie.add(btnAnalizar);
+        this.add(panelPie, BorderLayout.PAGE_END);
+    }
+    
+    private void btnAnalizar(java.awt.event.ActionEvent evt){
+        System.out.println(txtArea.getText());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
