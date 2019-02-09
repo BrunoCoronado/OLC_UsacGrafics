@@ -8,12 +8,16 @@ package sistema.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.StringReader;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import sistema.administracion.AdministracionArchivos;
 import sistema.scanner.scanner;
 
 /**
@@ -27,8 +31,12 @@ public class ventanaPrincipal extends javax.swing.JFrame {
     private JButton btnAnalizar;
     private JButton btnGuardarComo;
     private JButton btnReporteErrores;
-    //definicio area de texto
+    //definicion area de texto
     private JTextArea txtArea;
+    //definicion del file chooser
+    private JFileChooser fileChooser;
+    //declaracion clase administrativa
+    private AdministracionArchivos administracionArchivos;
     
     /**
      * Creates new form ventanaPrincipal
@@ -87,28 +95,75 @@ public class ventanaPrincipal extends javax.swing.JFrame {
         //pie de ventana
         JPanel panelPie = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnAnalizar = new JButton("Analizar");
-        //funcionamiento al boton
-        btnAnalizar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                btnAnalizar(ae);
-            }
-        });
         panelPie.add(btnAnalizar);
         this.add(panelPie, BorderLayout.PAGE_END);
+        //instanciacion del file chooser y la clase administrativa
+        fileChooser = new JFileChooser();
+        administracionArchivos = new AdministracionArchivos();
+        //definicion del filtro para archivos
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter(".gu", "gu");
+        fileChooser.setFileFilter(filtro);
+        inicializarFuncionamientoBotones();
     }
     
+    private void inicializarFuncionamientoBotones(){
+        //funcionamiento al boton
+        btnAnalizar.addActionListener((ActionEvent ae) -> {
+            btnAnalizar(ae);
+        });
+        
+        btnAbrir.addActionListener((ae) -> {
+            btnAbrirArchivo(ae);
+        });
+        btnGuardar.addActionListener((ae) -> {
+            btnGuardarArchivo(ae, 1);
+        });
+        btnGuardarComo.addActionListener((ae) -> {
+            btnGuardarArchivo(ae, 2);
+        });
+    }
+
     private void btnAnalizar(java.awt.event.ActionEvent evt){
         //System.out.println(txtArea.getText());
         try {
             StringReader strReader = new StringReader(txtArea.getText());
             scanner scanner = new scanner(strReader);
             scanner.yylex();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error en el scanner");
         }
     }
-
+    
+    private void btnAbrirArchivo(java.awt.event.ActionEvent evt){
+        try {
+            int retorno = fileChooser.showOpenDialog(this);
+            if(retorno == JFileChooser.APPROVE_OPTION){
+                this.setTitle(fileChooser.getSelectedFile().getPath());
+                txtArea.setText(administracionArchivos.abrirArchivo(fileChooser.getSelectedFile().getPath()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void btnGuardarArchivo(java.awt.event.ActionEvent evt, int tipo){
+        switch(tipo){
+                case 1://guardar normal
+                    if(!this.getTitle().equals("")){
+                        administracionArchivos.guardarArchivo(this.getTitle(), txtArea.getText(), 1);
+                    }else{
+                        JOptionPane.showMessageDialog(this, "No existe referencia a un archivo", "Error al Guardar", JOptionPane.WARNING_MESSAGE);
+                    }
+                    break;
+                case 2://guardar como
+                        int retorno = fileChooser.showSaveDialog(this);
+                        if(retorno == JFileChooser.APPROVE_OPTION){
+                            this.setTitle(fileChooser.getSelectedFile().getPath()+".gu");
+                            administracionArchivos.guardarArchivo(fileChooser.getSelectedFile().getPath()+".gu", txtArea.getText(), 2);
+                        }
+                    break;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
