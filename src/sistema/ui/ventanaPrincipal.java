@@ -9,10 +9,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.StringReader;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import sistema.scanner.scanner;
 
 /**
  *
@@ -97,7 +99,14 @@ public class ventanaPrincipal extends javax.swing.JFrame {
     }
     
     private void btnAnalizar(java.awt.event.ActionEvent evt){
-        System.out.println(txtArea.getText());
+        //System.out.println(txtArea.getText());
+        try {
+            StringReader strReader = new StringReader(txtArea.getText());
+            scanner scanner = new scanner(strReader);
+            scanner.yylex();
+        } catch (Exception e) {
+            System.out.println("Error en el scanner");
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
