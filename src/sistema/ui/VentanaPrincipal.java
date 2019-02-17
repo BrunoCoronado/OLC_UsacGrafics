@@ -10,6 +10,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -18,13 +19,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sistema.administracion.AdministracionArchivos;
-import sistema.scanner.scanner;
+import sistema.analisis.Scanner;
+import sistema.analisis.parser;
+import sistema.bean.GraficaBarras;
+import sistema.bean.Variable;
 
 /**
  *
  * @author bruno
  */
-public class ventanaPrincipal extends javax.swing.JFrame {
+public class VentanaPrincipal extends javax.swing.JFrame {
     //definicion botones ui
     private JButton btnAbrir;
     private JButton btnGuardar;
@@ -41,7 +45,7 @@ public class ventanaPrincipal extends javax.swing.JFrame {
     /**
      * Creates new form ventanaPrincipal
      */
-    public ventanaPrincipal() {
+    public VentanaPrincipal() {
         initComponents();
         configuracionVentana();
     }
@@ -124,13 +128,24 @@ public class ventanaPrincipal extends javax.swing.JFrame {
     }
 
     private void btnAnalizar(java.awt.event.ActionEvent evt){
-        //System.out.println(txtArea.getText());
         try {
-            StringReader strReader = new StringReader(txtArea.getText());
-            scanner scanner = new scanner(strReader);
-            scanner.yylex();
-        } catch (IOException e) {
-            System.out.println("Error en el scanner");
+            StringReader strReader = new StringReader(txtArea.getText()+"$");
+            Scanner scanner = new Scanner(strReader);
+            //scanner.yylex();
+            sistema.analisis.parser parser = new parser(scanner);
+            parser.parse();
+            if(main.Main.variablesGlobales.size() > 0){
+                for (Variable v : main.Main.variablesGlobales) {
+                    System.out.println(v.getIdentificador() + " | " + v.getTipo() + " | " + v.getValor());
+                }
+            }
+            if(main.Main.graficasDeBarras.size() > 0){
+                for (GraficaBarras g : main.Main.graficasDeBarras) {
+                    System.out.println(g.getId());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     

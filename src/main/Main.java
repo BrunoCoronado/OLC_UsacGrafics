@@ -5,19 +5,23 @@
  */
 package main;
 
-import sistema.ui.ventanaPrincipal;
+import java.util.ArrayList;
+import sistema.bean.GraficaBarras;
+import sistema.bean.GraficaLineas;
+import sistema.bean.Variable;
+import sistema.ui.VentanaPrincipal;
 
 /**
  *
  * @author bruno
  */
 public class Main {
-
-    /**
-     * @param args the command line arguments
-     */
+    public static ArrayList<Variable> variablesGlobales = new ArrayList<Variable>();
+    public static ArrayList<GraficaBarras> graficasDeBarras = new ArrayList<GraficaBarras>();
+    public static ArrayList<GraficaLineas> graficasDeLineas;
+    
     public static void main(String[] args) {
-        ventanaPrincipal ventanaPrincipal = new ventanaPrincipal();
+        VentanaPrincipal ventanaPrincipal = new VentanaPrincipal();
         ventanaPrincipal.setVisible(true);
     }
     
