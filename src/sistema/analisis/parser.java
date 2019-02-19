@@ -11,6 +11,7 @@ import sistema.bean.GraficaBarras;
 import sistema.bean.GraficaLineas;
 import sistema.bean.Variable;
 import sistema.bean.XYLine;
+import sistema.bean.Token;
 import main.Main;
 import java_cup.runtime.XMLElement;
 
@@ -301,13 +302,13 @@ public class parser extends java_cup.runtime.lr_parser {
     private Galeria galeria = new Galeria();
 
     public void syntax_error(Symbol s){ 
-        //enviar a tabla
         System.err.println("Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+        main.Main.errores.add(new Token(s.value.toString(), "ERROR SINTACTICO - NO SE ESPERABA ESTE SIMBOLO", s.left, s.right));
     } 
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
-        //enviar a tabla
         System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido.");
+        main.Main.errores.add(new Token(s.value.toString(), "ERROR SINTACTICO IRRECUPERABLE - SIMBOLO NO RECONODIO", s.left, s.right));
     }  
 
 

@@ -22,6 +22,7 @@ import sistema.administracion.AdministracionArchivos;
 import sistema.analisis.scanner;
 import sistema.analisis.parser;
 import sistema.graficas.GraficarGBarras;
+import sistema.graficas.GraficarTokens;
 
 /**
  *
@@ -129,12 +130,15 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void btnAnalizar(java.awt.event.ActionEvent evt){
         try {
             limpiarContenidoGlobal();
-            String abc = String.valueOf(Main.buscarVariableGlobal("a"));
             StringReader strReader = new StringReader(limpiarTexto(txtArea.getText())+"$");
             scanner scanner = new scanner(strReader);
             sistema.analisis.parser parser = new parser(scanner);
             parser.parse();
+            validarDatosGraficas();
             GraficarGBarras graficadorGBarras = new GraficarGBarras();
+            GraficarTokens graficarTokens = new GraficarTokens();
+            graficarTokens.graficarListaTokens();
+            graficarTokens.graficarListaErrores();
             if(Main.variablesGlobales.size() > 0){
                 Main.variablesGlobales.forEach((v) -> {
                     System.out.println(v.getIdentificador() + " | " + v.getTipo() + " | " + v.getValor());
@@ -164,6 +168,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         Main.graficasDeBarras = new ArrayList<>();
         Main.graficasDeLineas = new ArrayList<>();
         Main.galerias = new ArrayList<>();
+        Main.tokens = new ArrayList<>();
+        Main.errores = new ArrayList<>();
     }
     
     private String limpiarTexto(String texto){
@@ -172,6 +178,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         if(texto.contains("”"))
             texto = texto.replace('”', '\"');
         return texto;
+    }
+    
+    private void validarDatosGraficas(){
+        
     }
     
     private void btnAbrirArchivo(java.awt.event.ActionEvent evt){

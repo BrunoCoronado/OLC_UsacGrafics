@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import sistema.bean.Galeria;
 import sistema.bean.GraficaBarras;
 import sistema.bean.GraficaLineas;
+import sistema.bean.Token;
 import sistema.bean.Variable;
 import sistema.ui.VentanaPrincipal;
 
@@ -17,6 +18,8 @@ import sistema.ui.VentanaPrincipal;
  * @author bruno
  */
 public class Main {
+    public static ArrayList<Token> tokens;
+    public static ArrayList<Token> errores;
     public static ArrayList<Variable> variablesGlobales;
     public static ArrayList<GraficaBarras> graficasDeBarras;
     public static ArrayList<GraficaLineas> graficasDeLineas;
