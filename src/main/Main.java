@@ -27,4 +27,12 @@ public class Main {
         ventanaPrincipal.setVisible(true);
     }
     
+    public static Object buscarVariableGlobal(String identificador){
+        for (Variable variableGlobal : variablesGlobales) {
+            if(variableGlobal.getIdentificador().equals(identificador)){
+                return variableGlobal.getValor();
+            }
+        }
+        return null;
+    }
 }

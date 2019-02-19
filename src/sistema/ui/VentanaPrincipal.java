@@ -129,6 +129,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void btnAnalizar(java.awt.event.ActionEvent evt){
         try {
             limpiarContenidoGlobal();
+            String abc = String.valueOf(Main.buscarVariableGlobal("a"));
             StringReader strReader = new StringReader(limpiarTexto(txtArea.getText())+"$");
             scanner scanner = new scanner(strReader);
             sistema.analisis.parser parser = new parser(scanner);
