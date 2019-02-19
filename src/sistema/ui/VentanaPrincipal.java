@@ -8,7 +8,6 @@ package sistema.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -18,11 +17,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import main.Main;
 import sistema.administracion.AdministracionArchivos;
-import sistema.analisis.Scanner;
+import sistema.analisis.scanner;
 import sistema.analisis.parser;
-import sistema.bean.GraficaBarras;
-import sistema.bean.Variable;
 
 /**
  *
@@ -129,24 +127,50 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     private void btnAnalizar(java.awt.event.ActionEvent evt){
         try {
-            StringReader strReader = new StringReader(txtArea.getText()+"$");
-            Scanner scanner = new Scanner(strReader);
-            //scanner.yylex();
+            limpiarContenidoGlobal();
+            StringReader strReader = new StringReader(limpiarTexto(txtArea.getText())+"$");
+            scanner scanner = new scanner(strReader);
             sistema.analisis.parser parser = new parser(scanner);
             parser.parse();
-            if(main.Main.variablesGlobales.size() > 0){
-                for (Variable v : main.Main.variablesGlobales) {
+            if(Main.variablesGlobales.size() > 0){
+                Main.variablesGlobales.forEach((v) -> {
                     System.out.println(v.getIdentificador() + " | " + v.getTipo() + " | " + v.getValor());
-                }
+                });
             }
-            if(main.Main.graficasDeBarras.size() > 0){
-                for (GraficaBarras g : main.Main.graficasDeBarras) {
+            if(Main.graficasDeBarras.size() > 0){
+                Main.graficasDeBarras.forEach((g) -> {
                     System.out.println(g.getId());
-                }
+                });
+            }
+            if(Main.graficasDeLineas.size() > 0){
+                Main.graficasDeLineas.forEach((g) -> {
+                    System.out.println(g.getId());
+                });
+            }
+                if(Main.galerias.size() > 0){
+                Main.galerias.forEach((g) -> {
+                    System.out.println(g.getNombre());
+                });
             }
         } catch (Exception e) {
+            System.out.println("Error al analizar la entrada");
             e.printStackTrace();
         }
+    }
+    
+    private void limpiarContenidoGlobal(){
+        Main.variablesGlobales = new ArrayList<>();
+        Main.graficasDeBarras = new ArrayList<>();
+        Main.graficasDeLineas = new ArrayList<>();
+        Main.galerias = new ArrayList<>();
+    }
+    
+    private String limpiarTexto(String texto){
+        if(texto.contains("“"))
+            texto = texto.replace('“', '\"');
+        if(texto.contains("”"))
+            texto = texto.replace('”', '\"');
+        return texto;
     }
     
     private void btnAbrirArchivo(java.awt.event.ActionEvent evt){

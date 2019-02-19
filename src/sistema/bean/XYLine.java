@@ -5,59 +5,58 @@
  */
 package sistema.bean;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  *
  * @author bruno
  */
 public class XYLine {
-    private String nombre;
-    private String color;
-    private int Grosor;
-    private HashMap<Integer, Integer> puntos;
+        private String nombre;
+        private String color;
+        private int Grosor;
+        private ArrayList<CoordenadaXY> puntos;
 
-    public XYLine() {
-    }
+        public XYLine() {
+            puntos = new ArrayList<>();
+        }
 
-    public String getNombre() {
-        return nombre;
-    }
+        public String getNombre() {
+            return nombre;
+        }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
 
-    public String getColor() {
-        return color;
-    }
+        public String getColor() {
+            return color;
+        }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+        public void setColor(String color) {
+            this.color = color;
+        }
 
-    public int getGrosor() {
-        return Grosor;
-    }
+        public int getGrosor() {
+            return Grosor;
+        }
 
-    public void setGrosor(int Grosor) {
-        this.Grosor = Grosor;
-    }
+        public void setGrosor(int Grosor) {
+            this.Grosor = Grosor;
+        }
 
-    public HashMap<Integer, Integer> getPuntos() {
-        return puntos;
-    }
+        public ArrayList<CoordenadaXY> getPuntos() {
+            return puntos;
+        }
 
-    public void setPuntos(int puntoX, int puntoY) {
-        this.puntos.put(puntoX, puntoY);
-    }
+        public void setPuntos(int puntoX, int puntoY) {
+            this.puntos.add(new CoordenadaXY(puntoX, puntoY));
+        }
 
-    public XYLine(String nombre, String color, int Grosor, HashMap<Integer, Integer> puntos) {
-        this.nombre = nombre;
-        this.color = color;
-        this.Grosor = Grosor;
-        this.puntos = puntos;
+        public XYLine(String nombre, String color, int Grosor, ArrayList<CoordenadaXY> puntos) {
+            this.nombre = nombre;
+            this.color = color;
+            this.Grosor = Grosor;
+            this.puntos = puntos;
+        }
     }
-    
-    
-}
