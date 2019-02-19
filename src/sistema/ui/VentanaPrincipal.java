@@ -21,6 +21,7 @@ import main.Main;
 import sistema.administracion.AdministracionArchivos;
 import sistema.analisis.scanner;
 import sistema.analisis.parser;
+import sistema.graficas.GraficarGBarras;
 
 /**
  *
@@ -132,15 +133,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             scanner scanner = new scanner(strReader);
             sistema.analisis.parser parser = new parser(scanner);
             parser.parse();
+            GraficarGBarras graficadorGBarras = new GraficarGBarras();
             if(Main.variablesGlobales.size() > 0){
                 Main.variablesGlobales.forEach((v) -> {
                     System.out.println(v.getIdentificador() + " | " + v.getTipo() + " | " + v.getValor());
                 });
             }
             if(Main.graficasDeBarras.size() > 0){
-                Main.graficasDeBarras.forEach((g) -> {
-                    System.out.println(g.getId());
-                });
+                graficadorGBarras.graficarGB(Main.graficasDeBarras);
             }
             if(Main.graficasDeLineas.size() > 0){
                 Main.graficasDeLineas.forEach((g) -> {
