@@ -8,6 +8,7 @@ package sistema.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -21,7 +22,12 @@ import main.Main;
 import sistema.administracion.AdministracionArchivos;
 import sistema.analisis.scanner;
 import sistema.analisis.parser;
+import sistema.bean.Galeria;
+import sistema.bean.GraficaBarras;
+import sistema.bean.GraficaLineas;
+import sistema.bean.Token;
 import sistema.graficas.GraficarGBarras;
+import sistema.graficas.GraficarGLineas;
 import sistema.graficas.GraficarTokens;
 
 /**
@@ -41,6 +47,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private JFileChooser fileChooser;
     //declaracion clase administrativa
     private AdministracionArchivos administracionArchivos;
+    //declaracion variables graficadores
+    GraficarTokens graficarTokens;
+    GraficarGBarras graficadorGBarras;
+    GraficarGLineas graficadorGLineas;
     
     /**
      * Creates new form ventanaPrincipal
@@ -48,6 +58,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public VentanaPrincipal() {
         initComponents();
         configuracionVentana();
+        inicializarGraficadoras();
     }
 
     /**
@@ -126,6 +137,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             btnGuardarArchivo(ae, 2);
         });
     }
+    
+    private void inicializarGraficadoras(){
+        graficarTokens = new GraficarTokens();
+        graficadorGBarras = new GraficarGBarras();
+        graficadorGLineas = new GraficarGLineas();
+    }
 
     private void btnAnalizar(java.awt.event.ActionEvent evt){
         try {
@@ -134,29 +151,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             scanner scanner = new scanner(strReader);
             sistema.analisis.parser parser = new parser(scanner);
             parser.parse();
-            validarDatosGraficas();
-            GraficarGBarras graficadorGBarras = new GraficarGBarras();
-            GraficarTokens graficarTokens = new GraficarTokens();
-            graficarTokens.graficarListaTokens();
-            graficarTokens.graficarListaErrores();
-            if(Main.variablesGlobales.size() > 0){
-                Main.variablesGlobales.forEach((v) -> {
-                    System.out.println(v.getIdentificador() + " | " + v.getTipo() + " | " + v.getValor());
-                });
-            }
-            if(Main.graficasDeBarras.size() > 0){
-                graficadorGBarras.graficarGB(Main.graficasDeBarras);
-            }
-            if(Main.graficasDeLineas.size() > 0){
-                Main.graficasDeLineas.forEach((g) -> {
-                    System.out.println(g.getId());
-                });
-            }
-                if(Main.galerias.size() > 0){
-                Main.galerias.forEach((g) -> {
-                    System.out.println(g.getNombre());
-                });
-            }
+            reportarGraficas();
+            reportarTokens();
+//            if(Main.graficasDeBarras.size() > 0){
+//                graficadorGBarras.graficarGB(Main.graficasDeBarras);
+//            }
         } catch (Exception e) {
             System.out.println("Error al analizar la entrada");
             e.printStackTrace();
@@ -180,8 +179,95 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         return texto;
     }
     
-    private void validarDatosGraficas(){
+    private void reportarTokens(){
+        graficarTokens.graficarListaTokens();
+        graficarTokens.graficarListaErrores();
+    }
+    
+    private void reportarGraficas(){//primero debemos de validar que las graficas definidas sean validas, si no las removemos de las listas
+        boolean b = validarGBarras();
+        boolean c = validarrGLineas();
+        if(validarGBarras() & validarrGLineas()){
+            if(validarGaleria()){//primero validamos que las galeras sean validas para poder pasar a generar las graficas necesarias
+                for (Galeria galeria : Main.galerias) {
+                    crearDirectorios(galeria.getNombre());
+                    graficadorGBarras.graficarGB(galeria.getGraficas(), galeria.getNombre());
+                    //graficamos lineas
+                }
+            }
+        }
+    }
+    
+    private boolean validarGaleria(){//revisar/debugear
+        for (Galeria galeria : Main.galerias ) {
+            int existe = 0;
+            ArrayList<String> porRemover = new ArrayList<>();
+            for (String nombreGrafica : galeria.getGraficas()) {//validamos que los nombres de las graficas existan
+                for (GraficaBarras graficaBarras : Main.graficasDeBarras) {
+                    if(nombreGrafica.equals(graficaBarras.getId())){
+                        existe = 1;
+                        porRemover.add(graficaBarras.getId());
+                        break;
+                    }
+                }
+                if (existe == 0) {
+                    for (GraficaLineas graficaLineas : Main.graficasDeLineas) {
+                        if(nombreGrafica.equals(graficaLineas.getId())){
+                            existe = 1;
+                            porRemover.add(graficaLineas.getId());
+                            break;
+                        }
+                    }
+                }
+            }
+            if(porRemover.size() != 0){
+                galeria.getGraficas().remove(porRemover);
+            }
+        }
         
+        return true;
+    }
+    
+    private boolean validarGBarras(){
+        boolean resultado = true;
+        ArrayList<GraficaBarras> porRemover = new ArrayList<>();
+        for (GraficaBarras graficaBarras : Main.graficasDeBarras) {
+            if(graficaBarras.getEjeX().size() == 0 | graficaBarras.getEjeY().size() == 0 | graficaBarras.getPuntosXY().size() == 0 | graficaBarras.getId() == null 
+            | graficaBarras.getTitulo() == null | graficaBarras.getTituloX() == null | graficaBarras.getTituloY() == null){
+                resultado = false;
+                porRemover.add(graficaBarras);
+                main.Main.errores.add(new Token("Grafica de Barras", "CARACTERISTICAS INCOMPLETAS", 0, 0));
+            }
+        }
+        if(porRemover.size() != 0)
+            Main.graficasDeBarras.removeAll(porRemover);
+        return resultado;
+    }
+    
+    private boolean validarrGLineas(){
+        boolean resultado = true;
+        ArrayList<GraficaLineas> porRemover = new ArrayList<>();
+        for (GraficaLineas graficaLineas : Main.graficasDeLineas) {
+            if(graficaLineas.getLineas().size() == 0 | graficaLineas.getId() == null | graficaLineas.getTitulo() == null | graficaLineas.getTituloX() == null | graficaLineas.getTituloY()== null){
+                resultado = false;
+                porRemover.add(graficaLineas);
+                main.Main.errores.add(new Token("Grafica de Lineas", "CARACTERISTICAS INCOMPLETAS", 0, 0));
+            }
+        }
+        if(porRemover.size() != 0)
+            Main.graficasDeLineas.removeAll(porRemover);
+        return resultado;
+    }
+    
+    private boolean crearDirectorios(String path){
+        boolean respuesta = false;
+        try {
+            File archivo = new File(path);
+            respuesta = archivo.mkdirs();            
+        } catch (Exception e) {
+            System.err.println("ERROR AL CREAR DIRECTORIOS");
+        }
+        return respuesta;
     }
     
     private void btnAbrirArchivo(java.awt.event.ActionEvent evt){
