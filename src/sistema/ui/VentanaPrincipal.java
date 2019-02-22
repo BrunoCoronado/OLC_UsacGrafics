@@ -26,6 +26,7 @@ import sistema.bean.Galeria;
 import sistema.bean.GraficaBarras;
 import sistema.bean.GraficaLineas;
 import sistema.bean.Token;
+import sistema.bean.XYLine;
 import sistema.graficas.GraficarGBarras;
 import sistema.graficas.GraficarGLineas;
 import sistema.graficas.GraficarTokens;
@@ -185,14 +186,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
     
     private void reportarGraficas(){//primero debemos de validar que las graficas definidas sean validas, si no las removemos de las listas
-        boolean b = validarGBarras();
-        boolean c = validarrGLineas();
         if(validarGBarras() & validarrGLineas()){
             if(validarGaleria()){//primero validamos que las galeras sean validas para poder pasar a generar las graficas necesarias
                 for (Galeria galeria : Main.galerias) {
                     crearDirectorios(galeria.getNombre());
                     graficadorGBarras.graficarGB(galeria.getGraficas(), galeria.getNombre());
-                    //graficamos lineas
+                    graficadorGLineas.graficarGB(galeria.getGraficas(), galeria.getNombre());
                 }
             }
         }
@@ -247,11 +246,23 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private boolean validarrGLineas(){
         boolean resultado = true;
         ArrayList<GraficaLineas> porRemover = new ArrayList<>();
+        ArrayList<XYLine> porRemoverLineas = new ArrayList<>();
         for (GraficaLineas graficaLineas : Main.graficasDeLineas) {
             if(graficaLineas.getLineas().size() == 0 | graficaLineas.getId() == null | graficaLineas.getTitulo() == null | graficaLineas.getTituloX() == null | graficaLineas.getTituloY()== null){
                 resultado = false;
                 porRemover.add(graficaLineas);
                 main.Main.errores.add(new Token("Grafica de Lineas", "CARACTERISTICAS INCOMPLETAS", 0, 0));
+            }
+            if(resultado != false){
+                for (XYLine linea : graficaLineas.getLineas()) {
+                    if(linea.getGrosor() == 0 | linea.getColor()== null | linea.getNombre()== null | linea.getPuntos().size() == 0){
+                        resultado = false;
+                        porRemoverLineas.add(linea);
+                        main.Main.errores.add(new Token("XYLine", "CARACTERISTICAS INCOMPLETAS", 0, 0));
+                    }
+                }
+                if(porRemoverLineas.size() != 0)
+                    graficaLineas.getLineas().removeAll(porRemoverLineas);
             }
         }
         if(porRemover.size() != 0)

@@ -6,7 +6,6 @@
 package sistema.graficas;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import main.Main;
 import org.jfree.chart.ChartFactory;
@@ -22,6 +21,7 @@ import sistema.bean.GraficaBarras;
  * @author bruno
  */
 public class GraficarGBarras {
+    
     public void graficarGB(ArrayList<String> graficas, String rutaCarpeta){
         try {
             DefaultCategoryDataset dataset; 
@@ -35,20 +35,27 @@ public class GraficarGBarras {
 
             for (String nombreGrafica : graficas) {
                 for (GraficaBarras grafica : Main.graficasDeBarras) {
-                    if(nombreGrafica.equals(grafica.getId())){
-                        dataset = new DefaultCategoryDataset();
+                    try {
+                        if(nombreGrafica.equals(grafica.getId())){
+                            dataset = new DefaultCategoryDataset();
 
-                        ejeX = grafica.getEjeX();
-                        ejeY = grafica.getEjeY();
-                        puntosXY = grafica.getPuntosXY();
+                            ejeX = grafica.getEjeX();
+                            ejeY = grafica.getEjeY();
+                            puntosXY = grafica.getPuntosXY();
 
-                       for (CoordenadaXY coordenadaXY : puntosXY) {
-                           dataset.addValue(ejeY.get(coordenadaXY.getCoordenadaY()), ejeX.get(coordenadaXY.getCoordenadaX()), ejeX.get(coordenadaXY.getCoordenadaX()));
-                       }
-
-                       graficaBarras = ChartFactory.createBarChart(grafica.getTitulo(), grafica.getTituloX(), grafica.getTituloY(), dataset, PlotOrientation.VERTICAL, true, true, false);
-                       File gBarras = new File(rutaCarpeta +"\\"+grafica.getId()+".PNG");
-                       ChartUtilities.saveChartAsPNG(gBarras, graficaBarras, width, height);
+                           for (CoordenadaXY coordenadaXY : puntosXY) {
+                                try {   
+                                    dataset.addValue(ejeY.get(coordenadaXY.getCoordenadaY()), ejeX.get(coordenadaXY.getCoordenadaX()), ejeX.get(coordenadaXY.getCoordenadaX()));
+                                } catch (Exception e) {
+                                    System.err.println("ERROR AL DIBUJAR GRAFICA DE BARRAS - CONTENIDO OMITIDO");
+                                }
+                           }
+                           graficaBarras = ChartFactory.createBarChart(grafica.getTitulo(), grafica.getTituloX(), grafica.getTituloY(), dataset, PlotOrientation.VERTICAL, true, true, false);
+                           File gBarras = new File(rutaCarpeta +"\\"+grafica.getId()+".PNG");
+                           ChartUtilities.saveChartAsPNG(gBarras, graficaBarras, width, height);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("ERROR AL DIBUJAR GRAFICA DE BARRAS - CONTENIDO OMITIDO");
                     }
                 }
             }
