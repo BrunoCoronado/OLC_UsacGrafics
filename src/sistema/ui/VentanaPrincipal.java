@@ -41,7 +41,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private JButton btnGuardar;
     private JButton btnAnalizar;
     private JButton btnGuardarComo;
-    private JButton btnReporteErrores;
     //definicion area de texto
     private JTextArea txtArea;
     //definicion del file chooser
@@ -98,11 +97,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         btnAbrir = new JButton("Abrir");
         btnGuardar = new JButton("Guardar");
         btnGuardarComo = new JButton("Guardar Como");
-        btnReporteErrores = new JButton("Reporte Errores");
         panelOpciones.add(btnAbrir);
         panelOpciones.add(btnGuardar);
         panelOpciones.add(btnGuardarComo);
-        panelOpciones.add(btnReporteErrores);
         this.add(panelOpciones, BorderLayout.PAGE_START);
         //panel de texto
         txtArea = new JTextArea();

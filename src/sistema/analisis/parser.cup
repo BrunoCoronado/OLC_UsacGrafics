@@ -1,0 +1,289 @@
+package sistema.analisis;
+
+import java_cup.runtime.*;
+import sistema.bean.Galeria;
+import sistema.bean.GraficaBarras;
+import sistema.bean.GraficaLineas;
+import sistema.bean.Variable;
+import sistema.bean.XYLine;
+import sistema.bean.Token;
+import main.Main;
+
+
+parser code
+{:
+    private GraficaBarras gBarras = new GraficaBarras();
+    private GraficaLineas gLineas = new GraficaLineas();
+    private XYLine xyLine = new XYLine();
+    private Galeria galeria = new Galeria();
+
+    public void syntax_error(Symbol s){ 
+        System.err.println("Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+        main.Main.errores.add(new Token(s.value.toString(), "ERROR SINTACTICO - NO SE ESPERABA ESTE SIMBOLO", s.left, s.right));
+    } 
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+        System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido.");
+        main.Main.errores.add(new Token(s.value.toString(), "ERROR SINTACTICO IRRECUPERABLE - SIMBOLO NO RECONODIO", s.left, s.right));
+    }  
+:}
+
+terminal String definirglobales, entero, str, graficabarras, graficalineas, galeria, titulo, titulox, tituloy, ejex, ejey, puntosxy, definirxyline, nombre, color, grosor, puntos, igual, puntoycoma;
+terminal String llaveabre, llavecierra, dospuntos, corcheteabre, corchetecierra, interrogacionabre, interrogacioncierra, coma, parentesisabre, parentesiscierra, suma, resta, multiplicacion, division;
+terminal String identificador, cadena, aceptacion, id;
+terminal String numero;
+
+non terminal A,B,C,F,H,I,J,K,L,M,N,C1,C2,A1,A2,B1,B2,I1,I2,J1,J2,K1;
+non terminal String D;
+non terminal Integer G,E,P,O;
+
+precedence left coma;
+precedence left suma, resta;
+precedence left multiplicacion, division;
+precedence left parentesisabre, parentesiscierra;
+
+start with A; 
+
+A::= A1 aceptacion
+;
+
+A1::= A2 A1
+    |A2
+;
+
+A2::= definirglobales llaveabre B 
+    |graficabarras llaveabre C 
+        {:
+            main.Main.graficasDeBarras.add(gBarras);
+            gBarras = new GraficaBarras();    
+        :}
+    |graficalineas llaveabre I 
+        {:
+            main.Main.graficasDeLineas.add(gLineas);
+            gLineas = new GraficaLineas();
+        :}
+    |galeria llaveabre K 
+;
+
+B::= B1 llavecierra 
+;
+
+B1::= B2 B1
+    |B2
+;
+
+B2::=str identificador:a igual cadena:b puntoycoma
+        {:
+            main.Main.variablesGlobales.add(new Variable("str", a, b));
+        :}
+    |entero identificador:a igual O:b puntoycoma 
+        {:
+            main.Main.variablesGlobales.add(new Variable("entero", a, b));
+        :}
+;
+
+C::= C1 llavecierra
+;
+
+C1::= C2 C1
+    |C2 
+;
+
+C2::= id dospuntos D:a puntoycoma
+        {:
+            gBarras.setId(a);
+        :}
+    |titulo dospuntos D:a puntoycoma
+        {:
+            gBarras.setTitulo(a);
+        :}
+    |titulox dospuntos D:a puntoycoma
+        {:
+            gBarras.setTituloX(a);
+        :}  
+    |tituloy dospuntos D:a puntoycoma
+        {:
+            gBarras.setTituloY(a);
+        :}  
+    |ejex dospuntos corcheteabre E corchetecierra puntoycoma
+    |ejey dospuntos corcheteabre F corchetecierra puntoycoma
+    |puntosxy dospuntos corcheteabre H corchetecierra puntoycoma
+;
+
+D::= cadena:a
+        {:
+            RESULT = a;    
+        :}
+    |identificador:a
+        {:
+            String valor = null;
+            try{
+                valor = String.valueOf(Main.buscarVariableGlobal(a));
+            }catch(Exception ex){
+                System.out.println("Error al recuperar variable String");
+            }
+            if(valor != null){
+                RESULT =  String.valueOf(Main.buscarVariableGlobal(a));    
+            }else
+            {
+                System.out.println("Variable " + a + "No esta declarada");
+                RESULT = "";
+            }
+        :}
+;
+
+E::= E coma E
+    |D:a
+        {:
+            gBarras.setEjeX(a); 
+        :}
+;
+
+F::= F coma F
+    |G:a
+        {:
+            gBarras.setEjeY(a); 
+        :}
+;
+
+G::= O:a
+        {:
+            RESULT = a;    
+        :}
+    |identificador:a
+        {:
+            try{
+                RESULT =  (int)Main.buscarVariableGlobal(a);
+            }catch(Exception ex){
+                System.out.println("Error al recuperar variable int");
+                RESULT = 0;
+            }
+        :}
+;
+    
+H::= H coma H
+    |llaveabre G:a coma G:b llavecierra
+        {:
+            gBarras.setPuntosXY(a,b); 
+        :}
+;
+
+I::= I1 llavecierra
+;
+
+I1::= I2 I1
+    |I2
+;
+
+I2::= id dospuntos D:a puntoycoma
+        {:
+            gLineas.setId(a);
+        :}
+    |titulo dospuntos D:a puntoycoma 
+        {:
+            gLineas.setTitulo(a);
+        :}
+    |titulox dospuntos D:a puntoycoma 
+        {:
+            gLineas.setTituloX(a);
+        :}  
+    |tituloy dospuntos D:a puntoycoma 
+        {:
+            gLineas.setTituloY(a);
+        :}  
+    |definirxyline interrogacionabre J 
+        {:
+            gLineas.setLineas(xyLine);
+            xyLine = new XYLine();
+        :}
+;
+
+J::= J1 interrogacioncierra
+;
+
+J1::= J2 J1
+    |J2
+;
+
+ J2::= nombre dospuntos D:a puntoycoma 
+        {:
+            xyLine.setNombre(a);
+        :}
+    |color dospuntos D:a puntoycoma 
+        {:
+            xyLine.setColor(a);
+        :}
+    |grosor dospuntos G:a puntoycoma 
+        {:
+            xyLine.setGrosor(a);
+        :}
+    |puntos dospuntos corcheteabre M corchetecierra puntoycoma 
+;
+
+K::= K1 llavecierra
+;
+
+K1::= L K1 
+    |L
+;
+
+L::= galeria parentesisabre cadena:a coma N parentesiscierra puntoycoma
+        {:
+            galeria.setNombre(a);
+            main.Main.galerias.add(galeria);
+            galeria = new Galeria();
+        :}
+;
+
+M::= M coma M
+    |llaveabre G:a coma G:b llavecierra
+        {:
+            xyLine.setPuntos(a,b); 
+        :}
+;
+
+N::= N coma N
+    |cadena:a
+        {:
+            galeria.setGraficas(a);
+        :}
+;
+
+O::= P:a
+    {:
+        RESULT = a;
+    :}
+;
+
+P::= P:a suma P:b
+        {:
+            RESULT = a+b;
+        :}
+    |P:a resta P:b
+        {:
+            RESULT = a-b;
+        :}
+    |P:a multiplicacion P:b
+        {:
+            RESULT = a*b;
+        :}
+    |P:a division P:b
+        {:
+            try{
+                RESULT = a/b;
+            }catch(Exception ex){System.out.println("Error al realizar division");}
+        :}
+    |parentesisabre P:a parentesiscierra 
+        {:
+                RESULT = a;
+        :}
+    |numero:a
+        {:
+            try{
+                RESULT = Integer.parseInt(a);
+            }catch(Exception ex){
+                System.out.println("Error al detectar valor numerico en variable int");
+                RESULT = 0;
+            }
+        :}
+;

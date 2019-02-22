@@ -36,7 +36,7 @@ public class AdministracionArchivos {
         try {
             BufferedWriter writer;
             if(tipo == 1)
-                writer = new BufferedWriter(new FileWriter(ruta, true));
+                writer = new BufferedWriter(new FileWriter(ruta, false));
            else
                 writer = new BufferedWriter(new FileWriter(ruta, false));
             writer.write(texto);
